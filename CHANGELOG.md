@@ -10,3 +10,4 @@
 - Created Web Application OAuth client ID in gemini-50279, External/In production audience, JS origin https://lockhatinc.github.io
 - Set GOOGLE_CLIENT_ID secret; real client ID now injected in deployed index.html
 - Fix: removed async from GSI script tag to prevent ReferenceError: google is not defined
+- Fix: replace invalid generative-language OAuth scope with cloud-platform

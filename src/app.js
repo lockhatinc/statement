@@ -27,7 +27,7 @@ function showErr(msg) {
 
 const client = google.accounts.oauth2.initTokenClient({
   client_id: CLIENT_ID,
-  scope: 'https://www.googleapis.com/auth/generative-language openid email profile',
+  scope: 'https://www.googleapis.com/auth/cloud-platform openid email profile',
   callback: async resp => {
     if (resp.error) { showErr(`Auth failed: ${resp.error}`); return; }
     window.__state.token = resp.access_token;
