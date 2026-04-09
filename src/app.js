@@ -4,7 +4,7 @@ import { buildOds, download } from './ods.js';
 
 const CLIENT_ID = '873801679825-ss0jff8jhitvm1v7pj2chh4qdlg108ob.apps.googleusercontent.com';
 
-window.__state = { phase: 'no-auth', key: null, email: null, file: null };
+window.__state = { phase: 'no-auth', auth: null, email: null, file: null };
 window.__debug = () => window.__state;
 
 function el(id) { return document.getElementById(id); }
@@ -22,7 +22,7 @@ function render() {
 }
 
 function showErr(msg) {
-  window.__state.phase = window.__state.key ? 'has-key' : 'no-auth';
+  window.__state.phase = window.__state.auth ? 'has-key' : 'no-auth';
   render();
   el('error-msg').textContent = msg;
   el('error-msg').hidden = false;
@@ -36,9 +36,9 @@ const client = google.accounts.oauth2.initTokenClient({
     window.__state.phase = 'setting-up';
     render();
     try {
-      const key = await setup(resp.access_token);
+      const auth = await setup(resp.access_token);
       const ti = await fetch(`https://www.googleapis.com/oauth2/v2/tokeninfo?access_token=${resp.access_token}`).then(r => r.json());
-      window.__state.key = key;
+      window.__state.auth = auth;
       window.__state.email = ti.email;
       window.__state.phase = 'has-key';
       render();
@@ -51,7 +51,7 @@ const client = google.accounts.oauth2.initTokenClient({
 el('login-btn').addEventListener('click', () => client.requestAccessToken());
 
 el('sign-out-btn').addEventListener('click', () => {
-  window.__state = { phase: 'no-auth', key: null, email: null, file: null };
+  window.__state = { phase: 'no-auth', auth: null, email: null, file: null };
   render();
 });
 
@@ -74,12 +74,12 @@ function setFile(f) {
 }
 
 el('process-btn').addEventListener('click', async () => {
-  const { key, file } = window.__state;
-  if (!key || !file) return;
+  const { auth, file } = window.__state;
+  if (!auth || !file) return;
   window.__state.phase = 'processing';
   render();
   try {
-    const result = await ocr(file, key);
+    const result = await ocr(file, auth);
     const blob = await buildOds(result.headers, result.rows);
     download(blob, `ocr-result-${Date.now()}.ods`);
     window.__state.phase = 'has-key';

@@ -25,3 +25,5 @@
 - Fix: revert model to gemini-2.0-flash (gemini-3-flash-preview does not exist)
 - Fix: add x-goog-user-project header to all apikeys.googleapis.com calls to route quota through user's GCP project instead of OAuth app project
 - Fix: remove duplicate content in src/setup.js (file was doubled)
+- Fix: replace GCP API key provisioning with OAuth Bearer token auth for Gemini calls — GCP API keys don't get Gemini Developer free-tier quota; OAuth Bearer + x-goog-user-project routes correctly to user's project free quota
+- Refactor: setup.js now returns { token, projNum } instead of API key string; ocr.js uses Authorization Bearer header; apikeys.googleapis.com dependency removed entirely

@@ -40,42 +40,13 @@ export async function setup(token) {
     }
   }
 
-  const enable = async (svc) => {
-    const r = await fetch(`https://serviceusage.googleapis.com/v1/projects/${projNum}/services/${svc}:enable`, {
-      method: 'POST', headers: H(), body: JSON.stringify({})
-    });
+  await fetch(`https://serviceusage.googleapis.com/v1/projects/${projNum}/services/generativelanguage.googleapis.com:enable`, {
+    method: 'POST', headers: H(), body: JSON.stringify({})
+  }).then(async r => {
     const d = await r.json();
-    if (!r.ok) throw new Error(`Enable ${svc} ${r.status}: ${JSON.stringify(d).slice(0, 200)}`);
+    if (!r.ok) throw new Error(`Enable generativelanguage ${r.status}: ${JSON.stringify(d).slice(0, 200)}`);
     if (!d.done) await poll(`https://serviceusage.googleapis.com/v1/${d.name}`, token);
-  };
-  await Promise.all([
-    enable('generativelanguage.googleapis.com'),
-    enable('apikeys.googleapis.com')
-  ]);
+  });
 
-  const AK = () => ({ ...H(), 'x-goog-user-project': projNum });
-
-  for (let attempt = 0; attempt < 20; attempt++) {
-    const kl = await fetch(`https://apikeys.googleapis.com/v2/projects/${projNum}/locations/global/keys`, { headers: AK() }).then(r => r.json());
-    const existing = kl.keys?.find(k => k.displayName === 'gemoci');
-    if (existing) {
-      const ks = await fetch(`https://apikeys.googleapis.com/v2/${existing.name}/keyString`, { headers: AK() }).then(r => r.json());
-      if (!ks.keyString) throw new Error(`getKeyString failed: ${JSON.stringify(ks).slice(0, 200)}`);
-      return ks.keyString;
-    }
-    const kc = await fetch(`https://apikeys.googleapis.com/v2/projects/${projNum}/locations/global/keys`, {
-      method: 'POST', headers: AK(),
-      body: JSON.stringify({ displayName: 'gemoci', restrictions: { apiTargets: [{ service: 'generativelanguage.googleapis.com' }] } })
-    });
-    const kd = await kc.json();
-    if (kc.status === 403 && JSON.stringify(kd).includes('not been used')) {
-      await new Promise(r => setTimeout(r, 6000));
-      continue;
-    }
-    if (!kc.ok) throw new Error(`Key create ${kc.status}: ${JSON.stringify(kd).slice(0, 200)}`);
-    const kop = await poll(`https://apikeys.googleapis.com/v2/${kd.name}`, token);
-    if (!kop.response?.keyString) throw new Error(`Key op missing keyString: ${JSON.stringify(kop).slice(0, 200)}`);
-    return kop.response.keyString;
-  }
-  throw new Error('Key create failed after 20 attempts (120s): apikeys API propagation timeout');
+  return { token, projNum };
 }
