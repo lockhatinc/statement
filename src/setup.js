@@ -18,8 +18,8 @@ export async function setup(token) {
   const projectId = 'gemoci-' + suffix;
 
   let projNum;
-  const search = await fetch('https://cloudresourcemanager.googleapis.com/v3/projects:search?query=labels.gemoci%3A1', { headers: H() }).then(r => r.json());
-  const found = search.projects?.[0];
+  const search = await fetch(`https://cloudresourcemanager.googleapis.com/v3/projects:search?query=labels.gemoci%3A1+id%3A${projectId}`, { headers: H() }).then(r => r.json());
+  const found = search.projects?.find(p => p.projectId === projectId);
   if (found) {
     projNum = found.name.split('/')[1];
   } else {
