@@ -7,7 +7,7 @@ Static SPA — no server. Runs entirely in the browser.
 - `index.html` — entry point, loads GSI + JSZip CDN, mounts `src/app.js` as ES module
 - `src/app.js` — OAuth state machine (no-auth → setting-up → has-key → processing), UI events, orchestrates setup+ocr+ods
 - `src/setup.js` — idempotently provisions a Gemini API key via GCP APIs using OAuth token
-- `src/ocr.js` — Gemini 3 Flash REST call (`gemini-3-flash-preview` model) with API key query param
+- `src/ocr.js` — Gemini REST call (`gemini-2.0-flash` model) with API key query param
 - `src/ods.js` — builds ODS (OpenDocument Spreadsheet) blob via JSZip
 
 ## Auth
@@ -24,9 +24,10 @@ OAuth client ID: `873801679825-ss0jff8jhitvm1v7pj2chh4qdlg108ob.apps.googleuserc
 2. Derive deterministic `projectId = 'gemoci-' + 8charBase64EmailHash`
 3. Search CRM v3 for project with label `gemoci:1` — reuse if found
 4. If not found: create project, poll operation until done; 409 → GET existing by projectId
-5. Enable `generativelanguage.googleapis.com` via serviceusage (idempotent)
+5. Enable `generativelanguage.googleapis.com` and `apikeys.googleapis.com` via serviceusage in parallel (idempotent)
 6. List API keys — find key with `displayName='gemoci'`; if found, call getKeyString
 7. If not found: create key restricted to `generativelanguage.googleapis.com`, poll operation, return `keyString`
+8. Key create/list retries up to 20× with 6s delay — GCP apikeys API takes up to 120s to propagate after enable
 
 All steps throw with clear messages on failure. No fallbacks.
 
