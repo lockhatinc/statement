@@ -4,27 +4,26 @@ Static SPA — no server. Runs entirely in the browser.
 
 ## Architecture
 
-- `index.html` — entry point, loads GSI + JSZip CDNs, mounts `src/app.js` as ES module
-- `src/app.js` — auth state machine, UI events, orchestrates ocr+ods
-- `src/ocr.js` — Gemini 2.0 Flash REST call with user Bearer token
+- `index.html` — entry point, loads JSZip CDN, mounts `src/app.js` as ES module
+- `src/app.js` — API key state machine, UI events, orchestrates ocr+ods
+- `src/ocr.js` — Gemini 2.0 Flash REST call with API key query param
 - `src/ods.js` — builds ODS (OpenDocument Spreadsheet) blob via JSZip
 
 ## Auth
 
-Google Identity Services (GSI) implicit token flow. No backend. Token stored in `window.__state.token` (memory only, cleared on sign-out/page reload).
+No Google OAuth. User pastes their own Gemini API key into a password input. Key stored in `window.__state.key` (memory only, cleared on page reload or "Clear key"). State machine: `no-key` → `has-key` → `processing`.
 
-OAuth scope: `https://www.googleapis.com/auth/cloud-platform` — the `generative-language` scope does not exist and causes `invalid_scope`. GSI script must not have `async` attribute or the module executes before GSI loads.
+Gemini API key auth: `?key=<apiKey>` query param on the endpoint URL. No Authorization header.
+
+The Generative Language API does not support user OAuth tokens for `generateContent` — only API keys work. Do not attempt to add OAuth scopes for this API.
 
 ## Deploy
 
-GitHub Actions Pages deployment (workflow source, not gh-pages branch).
-Required GitHub secret: `GOOGLE_CLIENT_ID`.
+GitHub Actions Pages deployment (workflow source, not gh-pages branch). No secrets required.
 Live URL: `https://lockhatinc.github.io/statement/`
 
 ## Google Cloud setup
 
-1. Create OAuth 2.0 Client ID (Web application type)
-2. Add `https://lockhatinc.github.io` as authorized JS origin
-3. Enable the Generative Language API
-4. Add `cloud-platform` scope to OAuth consent screen Data Access
-5. Add `GOOGLE_CLIENT_ID` as a GitHub Actions secret
+1. Enable the Generative Language API for the project
+2. Create an API key in Credentials
+3. Users obtain their own API key from https://aistudio.google.com/apikey

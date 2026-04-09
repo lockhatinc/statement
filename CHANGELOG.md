@@ -11,3 +11,4 @@
 - Set GOOGLE_CLIENT_ID secret; real client ID now injected in deployed index.html
 - Fix: removed async from GSI script tag to prevent ReferenceError: google is not defined
 - Fix: replace invalid generative-language OAuth scope with cloud-platform
+- Refactor: replace Google OAuth with user-provided Gemini API key; remove GSI dependency

@@ -11,12 +11,12 @@ async function toBase64(file) {
   });
 }
 
-export async function ocr(file, token) {
+export async function ocr(file, key) {
   if (file.size > MAX_BYTES) throw new Error(`File too large: ${(file.size/1024/1024).toFixed(1)}MB exceeds 15MB limit`);
   const data = await toBase64(file);
-  const res = await fetch(ENDPOINT, {
+  const res = await fetch(`${ENDPOINT}?key=${encodeURIComponent(key)}`, {
     method: 'POST',
-    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{ parts: [{ inline_data: { mime_type: file.type, data } }, { text: PROMPT }] }],
       generation_config: { response_mime_type: 'application/json' }
