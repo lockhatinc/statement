@@ -40,12 +40,18 @@ export async function setup(token) {
     }
   }
 
-  const er = await fetch(`https://serviceusage.googleapis.com/v1/projects/${projNum}/services/generativelanguage.googleapis.com:enable`, {
-    method: 'POST', headers: H(), body: JSON.stringify({})
-  });
-  const ed = await er.json();
-  if (!er.ok) throw new Error(`Enable API ${er.status}: ${JSON.stringify(ed).slice(0, 200)}`);
-  if (!ed.done) await poll(`https://serviceusage.googleapis.com/v1/${ed.name}`, token);
+  const enable = async (svc) => {
+    const r = await fetch(`https://serviceusage.googleapis.com/v1/projects/${projNum}/services/${svc}:enable`, {
+      method: 'POST', headers: H(), body: JSON.stringify({})
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(`Enable ${svc} ${r.status}: ${JSON.stringify(d).slice(0, 200)}`);
+    if (!d.done) await poll(`https://serviceusage.googleapis.com/v1/${d.name}`, token);
+  };
+  await Promise.all([
+    enable('generativelanguage.googleapis.com'),
+    enable('apikeys.googleapis.com')
+  ]);
 
   const kl = await fetch(`https://apikeys.googleapis.com/v2/projects/${projNum}/locations/global/keys`, { headers: H() }).then(r => r.json());
   const existing = kl.keys?.find(k => k.displayName === 'gemoci');
