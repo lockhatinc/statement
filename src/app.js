@@ -30,7 +30,7 @@ function showErr(msg) {
 
 const client = google.accounts.oauth2.initTokenClient({
   client_id: CLIENT_ID,
-  scope: 'email https://www.googleapis.com/auth/cloud-platform',
+  scope: 'email https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/generative-language',
   callback: async (resp) => {
     if (resp.error) { showErr(`Sign-in failed: ${resp.error}`); return; }
     window.__state.phase = 'setting-up';

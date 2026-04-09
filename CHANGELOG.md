@@ -27,3 +27,4 @@
 - Fix: remove duplicate content in src/setup.js (file was doubled)
 - Fix: replace GCP API key provisioning with OAuth Bearer token auth for Gemini calls — GCP API keys don't get Gemini Developer free-tier quota; OAuth Bearer + x-goog-user-project routes correctly to user's project free quota
 - Refactor: setup.js now returns { token, projNum } instead of API key string; ocr.js uses Authorization Bearer header; apikeys.googleapis.com dependency removed entirely
+- Fix: add generative-language OAuth scope — cloud-platform alone is insufficient for generateContent, causes 403 ACCESS_TOKEN_SCOPE_INSUFFICIENT
