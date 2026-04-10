@@ -27,7 +27,6 @@ function showErr(msg) {
 }
 
 function setKey(key) {
-  if (!key) return;
   window.__state.key = key;
   window.__state.phase = 'has-key';
   localStorage.setItem('gemoci_key', key);
@@ -35,21 +34,17 @@ function setKey(key) {
   render();
 }
 
+function trySetKey() {
+  const key = el('api-key').value.trim();
+  if (key) setKey(key);
+}
+
 const saved = localStorage.getItem('gemoci_key');
 if (saved) setKey(saved);
 else render();
 
-el('api-key').addEventListener('change', () => {
-  const key = el('api-key').value.trim();
-  if (key) setKey(key);
-});
-
-el('api-key').addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    const key = el('api-key').value.trim();
-    if (key) setKey(key);
-  }
-});
+el('api-key').addEventListener('keydown', e => { if (e.key === 'Enter') trySetKey(); });
+el('api-key').addEventListener('blur', trySetKey);
 
 el('clear-btn').addEventListener('click', () => {
   localStorage.removeItem('gemoci_key');

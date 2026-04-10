@@ -38,10 +38,10 @@ h1{font-size:1.4rem;font-weight:700;margin-bottom:8px;color:#1a1a1a}
   <p class="sub">OCR any image to a spreadsheet using Gemini AI</p>
 
   <div id="key-label">Gemini API key — get one free at <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a></div>
-  <div class="key-row">
-    <input type="password" id="api-key" placeholder="AIza...">
+  <form class="key-row" onsubmit="return false">
+    <input type="password" id="api-key" placeholder="Paste key, press Enter">
     <button id="clear-btn" hidden>Clear</button>
-  </div>
+  </form>
 
   <div id="main-panel" hidden>
     <div id="dropzone">
