@@ -77,8 +77,8 @@ el('process-btn').addEventListener('click', async () => {
   window.__state.phase = 'processing';
   render();
   try {
-    const result = await ocr(file, key);
-    const blob = await buildOds(result.headers, result.rows);
+    const sheets = await ocr(file, key);
+    const blob = await buildOds(sheets);
     download(blob, `ocr-result-${Date.now()}.ods`);
     window.__state.phase = 'has-key';
     render();
