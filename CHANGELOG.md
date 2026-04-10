@@ -30,3 +30,10 @@
 - Fix: add generative-language OAuth scope — cloud-platform alone is insufficient for generateContent, causes 403 ACCESS_TOKEN_SCOPE_INSUFFICIENT
 - Fix: remove generative-language OAuth scope — it is a restricted scope that Google consent screen rejects; cloud-platform is sufficient for Gemini Bearer auth
 - Fix: restore generative-language scope — required for generateContent; unverified app works for test users explicitly added in OAuth consent screen
+
+## 2026-04-10
+
+- Refactor: replace Google OAuth + GCP provisioning with user-provided API key (aistudio.google.com/apikey); removes GSI dependency and OAuth scope restrictions entirely
+- Delete src/setup.js — GCP project provisioning no longer needed
+- State machine simplified to no-key → has-key → processing
+- Switch model to gemini-2.0-flash-exp (latest stable flash variant available via API key)

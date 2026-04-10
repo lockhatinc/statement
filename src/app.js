@@ -1,57 +1,41 @@
 import { ocr } from './ocr.js';
-import { setup } from './setup.js';
 import { buildOds, download } from './ods.js';
 
-const CLIENT_ID = '873801679825-ss0jff8jhitvm1v7pj2chh4qdlg108ob.apps.googleusercontent.com';
-
-window.__state = { phase: 'no-auth', auth: null, email: null, file: null };
+window.__state = { phase: 'no-key', key: null, file: null };
 window.__debug = () => window.__state;
 
 function el(id) { return document.getElementById(id); }
 
 function render() {
-  const { phase, file, email } = window.__state;
-  el('login-panel').hidden = phase !== 'no-auth';
-  el('setup-panel').hidden = phase !== 'setting-up';
-  el('main-panel').hidden = phase !== 'has-key' && phase !== 'processing';
+  const { phase, file } = window.__state;
+  el('key-panel').hidden = phase !== 'no-key';
+  el('main-panel').hidden = phase === 'no-key';
   el('spinner').hidden = phase !== 'processing';
   el('process-btn').disabled = phase === 'processing' || !file;
   el('error-msg').hidden = true;
-  if (email) el('user-email').textContent = email;
   if (file) el('file-name').textContent = file.name;
 }
 
 function showErr(msg) {
-  window.__state.phase = window.__state.auth ? 'has-key' : 'no-auth';
+  window.__state.phase = window.__state.key ? 'has-key' : 'no-key';
   render();
   el('error-msg').textContent = msg;
   el('error-msg').hidden = false;
 }
 
-const client = google.accounts.oauth2.initTokenClient({
-  client_id: CLIENT_ID,
-  scope: 'email https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/generative-language',
-  callback: async (resp) => {
-    if (resp.error) { showErr(`Sign-in failed: ${resp.error}`); return; }
-    window.__state.phase = 'setting-up';
-    render();
-    try {
-      const auth = await setup(resp.access_token);
-      const ti = await fetch(`https://www.googleapis.com/oauth2/v2/tokeninfo?access_token=${resp.access_token}`).then(r => r.json());
-      window.__state.auth = auth;
-      window.__state.email = ti.email;
-      window.__state.phase = 'has-key';
-      render();
-    } catch (err) {
-      showErr(err.message);
-    }
-  }
+el('key-btn').addEventListener('click', () => {
+  const key = el('api-key').value.trim();
+  if (!key) { showErr('Enter an API key'); return; }
+  window.__state.key = key;
+  window.__state.phase = 'has-key';
+  render();
 });
 
-el('login-btn').addEventListener('click', () => client.requestAccessToken());
+el('api-key').addEventListener('keydown', e => { if (e.key === 'Enter') el('key-btn').click(); });
 
-el('sign-out-btn').addEventListener('click', () => {
-  window.__state = { phase: 'no-auth', auth: null, email: null, file: null };
+el('clear-btn').addEventListener('click', () => {
+  window.__state = { phase: 'no-key', key: null, file: null };
+  el('api-key').value = '';
   render();
 });
 
@@ -74,12 +58,12 @@ function setFile(f) {
 }
 
 el('process-btn').addEventListener('click', async () => {
-  const { auth, file } = window.__state;
-  if (!auth || !file) return;
+  const { key, file } = window.__state;
+  if (!key || !file) return;
   window.__state.phase = 'processing';
   render();
   try {
-    const result = await ocr(file, auth);
+    const result = await ocr(file, key);
     const blob = await buildOds(result.headers, result.rows);
     download(blob, `ocr-result-${Date.now()}.ods`);
     window.__state.phase = 'has-key';
