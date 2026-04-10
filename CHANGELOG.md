@@ -48,3 +48,7 @@
 - Feature: layout reproduction — prompt instructs model to preserve original visual structure
 - Feature: page-break row stitching — split transaction rows merged onto originating page
 - UX: step-by-step instructions with direct aistudio.google.com/api-keys link; dropzone mentions PDF
+- Refactor: fully generalized OCR prompt — works for any document, not bank-statement-specific
+- Fix: null cell coercion now returns empty string instead of throwing
+- Fix: formula row numbers now correctly 1-based from first output row, accounting for metadata rows
+- Improvement: page-break stitching rule clarified — date comes from originating page, skip continuation fragments
