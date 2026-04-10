@@ -39,3 +39,4 @@
 - Switch model to gemini-2.0-flash-exp (latest stable flash variant available via API key)
 - Switch model to gemini-3.1-flash-lite-preview
 - Fix: JSZip is not a constructor — use window.JSZip global instead of dynamic CDN import
+- Localize jszip.min.js — remove CDN dependency, serve from same origin
