@@ -1,7 +1,17 @@
 const MODEL = 'gemini-3.1-flash-lite-preview';
 const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
 const MAX_BYTES = 20 * 1024 * 1024;
-const PROMPT = 'Convert this document into a well-structured spreadsheet. Think about what layout would be most useful in a spreadsheet application — use meaningful column headers, put transaction/line-item data in rows, group related fields logically. Return ONLY valid JSON in this exact format: {"headers": ["col1", "col2"], "rows": [["val1", "val2"]]}. The root object MUST have exactly two keys: "headers" (array of strings) and "rows" (array of arrays of strings). No nested objects. All values must be strings.';
+const PROMPT = `Convert this document into a spreadsheet. Layout rules:
+- If it is a bank statement or financial document:
+  - First rows: account metadata as [Field, Value, "", "", ""] — account holder, account number, statement period, opening balance, closing balance
+  - One empty separator row
+  - One row with transaction column labels: ["", "", "Date", "Description", "Debit (R)", "Credit (R)", "Balance (R)"] (or equivalent currency)
+  - Transaction rows: ["", "", date, description, debit or "", credit or "", balance]
+  - Leave debit cell empty if credit transaction and vice versa (do not write 0,00)
+  - Clean descriptions: remove only trailing OCR artifacts like isolated "R", "Rr", "Gr" at the very end, but preserve account numbers and meaningful text
+- For any other document: use meaningful column headers and put each data row as a row
+Return ONLY valid JSON: {"headers": ["Field","Value","Date","Description","Debit (R)","Credit (R)","Balance (R)"], "rows": [...]}.
+Root must have exactly "headers" and "rows". All values strings. No nested objects.`;
 
 async function toBase64(file) {
   return new Promise((res, rej) => {
