@@ -66,7 +66,7 @@ dropzone.addEventListener('click', () => el('file-input').click());
 
 function setFile(f) {
   if (!f) return;
-  if (!f.type.startsWith('image/')) { showErr('Only image files are supported'); return; }
+  if (!f.type.startsWith('image/') && f.type !== 'application/pdf') { showErr('Only image and PDF files are supported'); return; }
   window.__state.file = f;
   render();
 }

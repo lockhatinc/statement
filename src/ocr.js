@@ -1,7 +1,7 @@
 const MODEL = 'gemini-3.1-flash-lite-preview';
 const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
-const MAX_BYTES = 15 * 1024 * 1024;
-const PROMPT = 'Extract all data from this image into a JSON structure. Return ONLY valid JSON, no markdown, no explanation. Format: {"headers": ["col1", "col2"], "rows": [["val1", "val2"]]}. If no table exists, use headers:[] and put each text line as a single-element row. All values must be strings.';
+const MAX_BYTES = 20 * 1024 * 1024;
+const PROMPT = 'Extract all data from this document into a JSON structure. Return ONLY valid JSON, no markdown, no explanation. Format: {"headers": ["col1", "col2"], "rows": [["val1", "val2"]]}. If no table exists, use headers:[] and put each text line as a single-element row. All values must be strings.';
 
 async function toBase64(file) {
   return new Promise((res, rej) => {
@@ -13,7 +13,7 @@ async function toBase64(file) {
 }
 
 export async function ocr(file, key) {
-  if (file.size > MAX_BYTES) throw new Error(`File too large: ${(file.size/1024/1024).toFixed(1)}MB exceeds 15MB limit`);
+  if (file.size > MAX_BYTES) throw new Error(`File too large: ${(file.size/1024/1024).toFixed(1)}MB exceeds 20MB limit`);
   const data = await toBase64(file);
   const res = await fetch(`${ENDPOINT}?key=${encodeURIComponent(key)}`, {
     method: 'POST',

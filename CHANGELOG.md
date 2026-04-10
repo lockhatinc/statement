@@ -41,3 +41,4 @@
 - Fix: JSZip is not a constructor — use window.JSZip global instead of dynamic CDN import
 - Localize jszip.min.js — remove CDN dependency, serve from same origin
 - UX: remove "Use this key"/"Change key" buttons; key auto-saves on enter/blur, persists in localStorage, masked once set; single "Clear" button to reset
+- Feature: accept PDF files in addition to images; increase size limit to 20MB
