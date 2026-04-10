@@ -35,7 +35,7 @@ Return ONLY valid JSON — no markdown, no explanation:
 CELL TYPES:
 - String: "some text"
 - Number: {"type":"number","value":1234.56,"display":"1 234,56"}
-- Formula: {"type":"formula","formula":"of:=B2+C2","display":"1 234,56"}
+- Formula: {"type":"formula","formula":"=B2+C2","display":"1 234,56"}
 
 LAYOUT — reproduce every visible element top-to-bottom, left-to-right, exactly as it appears:
 - Read the page from top to bottom. Every element you see becomes a row.
@@ -59,9 +59,9 @@ NUMBERS — every pure numeric value must be a number object:
 
 FORMULAS — when a cell's value is derived from other cells in the same sheet:
 - Number rows in your output starting at 1 for the first row of this page
-- Running balance (balance[n] = balance[n-1] + amount[n]): Seed is a number, each next row is a formula. Balance in col D, amount in col C, row 8: {"type":"formula","formula":"of:=D7+C8","display":"..."}
+- Running balance (balance[n] = balance[n-1] + amount[n]): Seed is a number, each next row is a formula. Balance in col D, amount in col C, row 8: {"type":"formula","formula":"=D7+C8","display":"..."}
 - Row numbers in formulas must match actual row indices in the JSON output (1 = first rows[] entry)
-- Totals: {"type":"formula","formula":"of:=SUM(C2:C15)","display":"..."}
+- Totals: {"type":"formula","formula":"=SUM(C2:C15)","display":"..."}
 - Cross-page first row: use a number object (no cross-sheet references)`;
 }
 
