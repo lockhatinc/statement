@@ -35,11 +35,11 @@ function setKey(key) {
 }
 
 function trySetKey() {
-  const key = el('api-key').value.trim();
+  const key = el('api-key').value.replace(/^["'\s]+|["'\s]+$/g, '');
   if (key) setKey(key);
 }
 
-const saved = localStorage.getItem('gemoci_key');
+const saved = (localStorage.getItem('gemoci_key') || '').replace(/^["'\s]+|["'\s]+$/g, '');
 if (saved) setKey(saved);
 else render();
 
